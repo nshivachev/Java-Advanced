@@ -1,20 +1,19 @@
 package Advanced.DefiningClassesEx.FamilyTree;
 
-import java.util.List;
-
-public class Child {
-    private String firstName;
-    private String lastName;
-    private String date;
-    private List<Parent> parents;
-    private List<Child> children;
+public class Child extends Person {
+    public Child(String firstName, String lastName, String date) {
+        super(firstName, lastName, date);
+    }
 
     public Child(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+        super(firstName, lastName);
     }
 
     public Child(String date) {
-        this.date = date;
+        super(date);
+    }
+
+    public Child() {
+        super();
     }
 }

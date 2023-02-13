@@ -1,8 +1,8 @@
 package Advanced.DefiningClassesEx.FamilyTree;
 
-import javax.sql.rowset.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Person {
     private String firstName;
@@ -20,16 +20,15 @@ public class Person {
     }
 
     public Person(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        parents = new ArrayList<>();
-        children = new ArrayList<>();
+        this(firstName, lastName, "");
     }
 
     public Person(String date) {
-        this.date = date;
-        parents = new ArrayList<>();
-        children = new ArrayList<>();
+        this("", "", date);
+    }
+
+    public Person() {
+        this("", "", "");
     }
 
     public String getFirstName() {
@@ -60,15 +59,78 @@ public class Person {
         return parents;
     }
 
-    public void setParents(Parent parents) {
-        this.parents.add(parents);
+    public void addParent(String firstName, String lastName, String date) {
+        Predicate<Parent> predicate = p -> (p.getFirstName().equals(firstName) && p.getLastName().equals(lastName) || p.getDate().equals(date));
+        if (getParents().stream().anyMatch(predicate)) {
+            Parent parent = getParents().stream().filter(predicate).findFirst().get();
+            parent.setFirstName(firstName);
+            parent.setLastName(lastName);
+            parent.setDate(date);
+        } else {
+            getParents().add(new Parent(firstName, lastName));
+        }
+    }
+
+    public void addParent(String firstName, String lastName) {
+        Predicate<Parent> predicate = p -> p.getFirstName().equals(firstName) && p.getLastName().equals(lastName);
+        if (getParents().stream().anyMatch(predicate)) {
+            Parent parent = getParents().stream().filter(predicate).findFirst().get();
+            parent.setFirstName(firstName);
+            parent.setLastName(lastName);
+        } else {
+            getParents().add(new Parent(firstName, lastName));
+        }
+    }
+
+    public void addParent(String date) {
+        Predicate<Parent> predicate = p -> p.getDate().equals(date);
+        if (getParents().stream().anyMatch(predicate)) {
+            Parent parent = getParents().stream().filter(predicate).findFirst().get();
+            parent.setDate(date);
+        } else {
+            getParents().add(new Parent(date));
+        }
     }
 
     public List<Child> getChildren() {
         return children;
     }
 
-    public void setChildren(Child children) {
-        this.children.add(children);
+    public void addChild(String firstName, String lastName, String date) {
+        Predicate<Child> predicate = p -> (p.getFirstName().equals(firstName) && p.getLastName().equals(lastName) || p.getDate().equals(date));
+        if (getChildren().stream().anyMatch(predicate)) {
+            Child child = getChildren().stream().filter(predicate).findFirst().get();
+            child.setFirstName(firstName);
+            child.setLastName(lastName);
+            child.setDate(date);
+        } else {
+            getParents().add(new Parent(firstName, lastName));
+        }
+    }
+
+    public void addChild(String firstName, String lastName) {
+        Predicate<Child> predicate = p -> p.getFirstName().equals(firstName) && p.getLastName().equals(lastName);
+        if (getChildren().stream().anyMatch(predicate)) {
+            Child child =  getChildren().stream().filter(predicate).findFirst().get();
+            child.setFirstName(firstName);
+            child.setLastName(lastName);
+        } else {
+            getChildren().add(new Child(firstName, lastName));
+        }
+    }
+
+    public void addChild(String date) {
+        Predicate<Child> predicate = p -> p.getDate().equals(date);
+        if (getChildren().stream().anyMatch(predicate)) {
+            Child child =  getChildren().stream().filter(predicate).findFirst().get();
+            child.setDate(date);
+        } else {
+            getChildren().add(new Child(date));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s %s", getFirstName(), getLastName(), getDate());
     }
 }
