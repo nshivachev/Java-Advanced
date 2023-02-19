@@ -27,10 +27,6 @@ public class Person {
         this("", "", date);
     }
 
-    public Person() {
-        this("", "", "");
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -59,18 +55,6 @@ public class Person {
         return parents;
     }
 
-    public void addParent(String firstName, String lastName, String date) {
-        Predicate<Parent> predicate = p -> (p.getFirstName().equals(firstName) && p.getLastName().equals(lastName) || p.getDate().equals(date));
-        if (getParents().stream().anyMatch(predicate)) {
-            Parent parent = getParents().stream().filter(predicate).findFirst().get();
-            parent.setFirstName(firstName);
-            parent.setLastName(lastName);
-            parent.setDate(date);
-        } else {
-            getParents().add(new Parent(firstName, lastName));
-        }
-    }
-
     public void addParent(String firstName, String lastName) {
         Predicate<Parent> predicate = p -> p.getFirstName().equals(firstName) && p.getLastName().equals(lastName);
         if (getParents().stream().anyMatch(predicate)) {
@@ -94,18 +78,6 @@ public class Person {
 
     public List<Child> getChildren() {
         return children;
-    }
-
-    public void addChild(String firstName, String lastName, String date) {
-        Predicate<Child> predicate = p -> (p.getFirstName().equals(firstName) && p.getLastName().equals(lastName) || p.getDate().equals(date));
-        if (getChildren().stream().anyMatch(predicate)) {
-            Child child = getChildren().stream().filter(predicate).findFirst().get();
-            child.setFirstName(firstName);
-            child.setLastName(lastName);
-            child.setDate(date);
-        } else {
-            getParents().add(new Parent(firstName, lastName));
-        }
     }
 
     public void addChild(String firstName, String lastName) {
