@@ -5,8 +5,8 @@ public class Cat {
     private String name;
     private double size;
 
-    Cat(String name, double size) {
-        this.breed = "Siamese";
+    Cat(String breed, String name, double size) {
+        this.breed = breed;
         this.name = name;
         this.size = size;
     }
