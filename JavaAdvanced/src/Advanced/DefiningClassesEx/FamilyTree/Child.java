@@ -12,8 +12,4 @@ public class Child extends Person {
     public Child(String date) {
         super(date);
     }
-
-    public Child() {
-        super();
-    }
 }
