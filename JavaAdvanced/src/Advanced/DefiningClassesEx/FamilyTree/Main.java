@@ -1,9 +1,8 @@
 package Advanced.DefiningClassesEx.FamilyTree;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,235 +10,166 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        List<Person> parentList = new ArrayList<>();
-        List<Person> childrenList = new ArrayList<>();
+        Map<String, Person> personMap = new LinkedHashMap<>();
 
         String personToPrint = scanner.nextLine();
 
-        String info = scanner.nextLine();
+        String personInfo = scanner.nextLine();
+        while (!personInfo.equals("End")) {
+            Pattern nameNamePattern = Pattern.compile("(?<firstNameParent>[A-Za-z]+) (?<lastNameParent>[A-Za-z]+) - (?<firstNameChild>[A-Za-z]+) (?<lastNameChild>[A-Za-z]+)");
+            Pattern nameDatePattern = Pattern.compile("(?<firstNameParent>[A-Za-z]+) (?<lastNameParent>[A-Za-z]+) - (?<dateChild>[\\d]+/[\\d]+/[\\d]{4})");
+            Pattern dateNamePattern = Pattern.compile("(?<dateParent>[\\d]+/[\\d]+/[\\d]{4}) - (?<firstNameChild>[A-Za-z]+) (?<lastNameChild>[A-Za-z]+)");
+            Pattern dateDatePattern = Pattern.compile("(?<dateParent>[\\d]+/[\\d]+/[\\d]{4}) - (?<dateChild>[\\d]+/[\\d]+/[\\d]{4})");
+            Pattern updatePattern = Pattern.compile("(?<firstNamePerson>[A-Za-z]+) (?<lastNamePerson>[A-Za-z]+) (?<datePerson>[\\d]+/[\\d]+/[\\d]{4})");
 
-        while (!info.equals("End")) {
-            Pattern pattern1 = Pattern.compile("(?<parentFirstName>[A-Za-z]+) (?<parentLastName>[A-Za-z]+) - (?<childFirstName>[A-Za-z]+) (?<childSecondName>[A-Za-z]+)");
-            Pattern pattern2 = Pattern.compile("(?<parentFirstName>[A-Za-z]+) (?<parentLastName>[A-Za-z]+) - (?<childDate>[0-9]+/[0-9]+/[0-9]+)");
-            Pattern pattern3 = Pattern.compile("(?<parentDate>[0-9]+/[0-9]+/[0-9]+) - (?<childFirstName>[A-Za-z]+) (?<childLastName>[A-Za-z]+)");
-            Pattern pattern4 = Pattern.compile("(?<parentDate>[0-9]+/[0-9]+/[0-9]+) - (?<childDate>[0-9]+/[0-9]+/[0-9]+)");
-            Pattern pattern5 = Pattern.compile("(?<parentFirstName>[A-Za-z]+) (?<parentLastName>[A-Za-z]+) (?<childDate>[0-9]+/[0-9]+/[0-9]+)");
+            Matcher nameNameMatcher = nameNamePattern.matcher(personInfo);
+            Matcher nameDateMatcher = nameDatePattern.matcher(personInfo);
+            Matcher dateNameMatcher = dateNamePattern.matcher(personInfo);
+            Matcher dateDateMatcher = dateDatePattern.matcher(personInfo);
+            Matcher updateMatcher = updatePattern.matcher(personInfo);
 
-            Matcher matcher1 = pattern1.matcher(info);
-            Matcher matcher2 = pattern2.matcher(info);
-            Matcher matcher3 = pattern3.matcher(info);
-            Matcher matcher4 = pattern4.matcher(info);
-            Matcher matcher5 = pattern5.matcher(info);
+            if (nameNameMatcher.find()) {
+                String firstNameParent = nameNameMatcher.group("firstNameParent");
+                String lastNameParent = nameNameMatcher.group("lastNameParent");
+                String firstNameChild = nameNameMatcher.group("firstNameChild");
+                String lastNameChild = nameNameMatcher.group("lastNameChild");
 
-            Person child;
-            Person parent;
-            if (matcher1.find()) {
-                String parentFirstName = matcher1.group("parentFirstName");
-                String parentLastName = matcher1.group("parentLastName");
-                String childFirstName = matcher1.group("childFirstName");
-                String childLastName = matcher1.group("childSecondName");
+                String parentName = firstNameParent + " " + lastNameParent;
+                String childName = firstNameChild + " " + lastNameChild;
 
-                parent = getPerson(parentList, parentFirstName, parentLastName);
-                child = getPerson(childrenList, childFirstName, childLastName);
+                personMap.putIfAbsent(parentName, new Person(firstNameParent, lastNameParent));
+                personMap.get(parentName).addChild(new Person(firstNameChild, lastNameChild));
 
-                if (parent == null) {
-                    parent = new Parent(parentFirstName, parentLastName);
-                    parentList.add(parent);
-                } else {
-                    parent.setFirstName(parentFirstName);
-                    parent.setLastName(parentLastName);
-                }
+                personMap.putIfAbsent(childName, new Person(firstNameChild, lastNameChild));
+                personMap.get(childName).addParent(new Person(firstNameParent, lastNameParent));
+            } else if (nameDateMatcher.find()) {
+                String firstNameParent = nameDateMatcher.group("firstNameParent");
+                String lastNameParent = nameDateMatcher.group("lastNameParent");
+                String dateChild = nameDateMatcher.group("dateChild");
 
-                if (child == null) {
-                    child = new Child(childFirstName, childLastName);
-                    childrenList.add(child);
-                } else {
-                    child.setFirstName(childFirstName);
-                    child.setLastName(childFirstName);
-                }
+                String nameParent = firstNameParent + " " + lastNameParent;
 
-                child.addParent(parentFirstName, parentLastName);
-                parent.addChild(childFirstName, childLastName);
+                personMap.putIfAbsent(nameParent, new Person(firstNameParent, lastNameParent));
+                personMap.get(nameParent).addChild(new Person(dateChild));
 
-            } else if (matcher2.find()) {
-                String parentFirstName = matcher2.group("parentFirstName");
-                String parentLastName = matcher2.group("parentLastName");
-                String childDate = matcher2.group("childDate");
+                personMap.putIfAbsent(dateChild, new Person(dateChild));
+                personMap.get(dateChild).addParent(new Person(firstNameParent, lastNameParent));
+            } else if (dateNameMatcher.find()) {
+                String dateParent = dateNameMatcher.group("dateParent");
+                String firstNameChild = dateNameMatcher.group("firstNameChild");
+                String lastNameChild = dateNameMatcher.group("lastNameChild");
 
-                parent = getPerson(parentList, parentFirstName, parentLastName);
-                child = getPerson(childrenList, childDate);
+                String nameChild = firstNameChild + " " + lastNameChild;
 
-                if (parent == null) {
-                    parent = new Parent(parentFirstName, parentLastName);
-                    parentList.add(parent);
-                } else {
-                    parent.setFirstName(parentFirstName);
-                    parent.setLastName(parentLastName);
-                }
+                personMap.putIfAbsent(dateParent, new Person(dateParent));
+                personMap.get(dateParent).addChild(new Person(firstNameChild, lastNameChild));
 
-                if (child == null) {
-                    child = new Child(childDate);
-                    childrenList.add(child);
-                } else {
-                    child.setDate(childDate);
-                }
+                personMap.putIfAbsent(nameChild, new Person(firstNameChild, lastNameChild));
+                personMap.get(nameChild).addParent(new Person(dateParent));
+            } else if (dateDateMatcher.find()) {
+                String dateParent = dateDateMatcher.group("dateParent");
+                String dateChild = dateDateMatcher.group("dateChild");
 
-                child.addParent(parentFirstName, parentLastName);
-                parent.addChild(childDate);
+                personMap.putIfAbsent(dateParent, new Person(dateParent));
+                personMap.get(dateParent).addChild(new Person(dateChild));
 
-            } else if (matcher3.find()) {
-                String parentDate = matcher3.group("parentDate");
-                String childFirstName = matcher3.group("childFirstName");
-                String childLastName = matcher3.group("childLastName");
+                personMap.putIfAbsent(dateChild, new Person(dateChild));
+                personMap.get(dateChild).addParent(new Person(dateParent));
+            } else if (updateMatcher.find()) {
+                String firstNamePerson = updateMatcher.group("firstNamePerson");
+                String lastNamePerson = updateMatcher.group("lastNamePerson");
+                String datePerson = updateMatcher.group("datePerson");
 
-                parent = getPerson(parentList, parentDate);
-                child = getPerson(childrenList, childFirstName, childLastName);
+                String namePerson = firstNamePerson + " " + lastNamePerson;
 
-                if (parent == null) {
-                    parent = new Parent(parentDate);
-                    parentList.add(new Person(parentDate));
-                } else {
-                    parent.setDate(parentDate);
-                }
+                personMap.forEach((key, value) -> {
+                    if ((value.getFirstName().equals(firstNamePerson) && value.getLastName().equals(lastNamePerson)) || key.equals(datePerson)) {
+                        value.setFirstName(firstNamePerson);
+                        value.setLastName(lastNamePerson);
+                        value.setDate(datePerson);
+                    }
 
-                if (child == null) {
-                    child = new Child(childFirstName, childLastName);
-                    childrenList.add(child);
-                } else {
-                    child.setFirstName(childFirstName);
-                    child.setLastName(childLastName);
-                }
+                    value.getChildren().forEach(child -> {
+                        if ((child.getFirstName().equals(firstNamePerson) && child.getLastName().equals(lastNamePerson)) || child.getDate().equals(datePerson)) {
+                            child.setFirstName(firstNamePerson);
+                            child.setLastName(lastNamePerson);
+                            child.setDate(datePerson);
+                        }
+                    });
 
-                child.addParent(parentDate);
-                parent.addChild(childFirstName, childLastName);
+                    value.getParents().forEach(parent -> {
+                        if ((parent.getFirstName().equals(firstNamePerson) && parent.getLastName().equals(lastNamePerson)) || parent.getDate().equals(datePerson)) {
+                            parent.setFirstName(firstNamePerson);
+                            parent.setLastName(lastNamePerson);
+                            parent.setDate(datePerson);
+                        }
+                    });
+                });
 
-            } else if (matcher4.find()) {
-                String parentDate = matcher4.group("parentDate");
-                String childDate = matcher4.group("childDate");
-
-                parent = getPerson(parentList, parentDate);
-                child = getPerson(childrenList, childDate);
-
-                if (parent == null) {
-                    parent = new Parent(parentDate);
-                    parentList.add(parent);
-                } else {
-                    parent.setDate(parentDate);
-                }
-
-                if (child == null) {
-                    child = new Child(childDate);
-                    childrenList.add(child);
-                } else {
-                    child.setDate(childDate);
-                }
-
-                child.addParent(parentDate);
-                parent.addChild(childDate);
-
-            } else if (matcher5.find()) {
-                String firstName = matcher5.group("parentFirstName");
-                String lastName = matcher5.group("parentLastName");
-                String date = matcher5.group("childDate");
-
-                parent = getPerson(parentList, firstName, lastName, date);
-                child = getPerson(childrenList, firstName, lastName, date);
-
-                if (parent == null) {
-                    parent = new Parent(firstName, lastName, date);
-                    parentList.add(parent);
-                } else {
-                    parent.setFirstName(firstName);
-                    parent.setLastName(lastName);
-                    parent.setDate(date);
-                }
-
-                if (child == null) {
-                    child = new Child(firstName, lastName, date);
-                    childrenList.add(child);
-                } else {
-                    child.setFirstName(firstName);
-                    child.setLastName(lastName);
-                    child.setDate(date);
+                if (personToPrint.contains(namePerson) || personToPrint.contains(datePerson)) {
+                    personToPrint = namePerson + " " + datePerson;
                 }
             }
-
-            info = scanner.nextLine();
+            personInfo = scanner.nextLine();
         }
 
-        Pattern personDate = Pattern.compile("[0-9]+/[0-9]+/[0-9]+");
-        Matcher matcher = personDate.matcher(personToPrint);
+        Pattern namePattern = Pattern.compile("(?<firstNameParent>[A-Za-z]+) (?<lastNameParent>[A-Za-z]+)");
+        Pattern datePattern = Pattern.compile("(?<dateParent>[\\d]+/[\\d]+/[\\d]{4})");
+        Pattern nameDatePattern = Pattern.compile("(?<firstNameParent>[A-Za-z]+) (?<lastNameParent>[A-Za-z]+) (?<dateParent>[\\d]+/[\\d]+/[\\d]{4})");
 
-        Person person;
-        if (matcher.find()) {
-            person = getPerson(parentList, personToPrint);
+        Matcher nameMatcher = namePattern.matcher(personToPrint);
+        Matcher dateMatcher = datePattern.matcher(personToPrint);
+        Matcher nameDateMatcher = nameDatePattern.matcher(personToPrint);
 
-            System.out.println(person);
-            System.out.println("Parents:");
+        System.out.println(personToPrint);
+        System.out.println("Parents:");
 
-            person = getPerson(childrenList, personToPrint);
-
-            if (person.getParents() != null) {
-                person.getParents().forEach(parent ->
-                        System.out.println(getPerson(parentList, parent.getFirstName(), parent.getLastName(), parent.getDate())));
+        if (nameMatcher.find()) {
+            for (var entry : personMap.entrySet()) {
+                if (entry.getValue().getFirstName().equals(nameMatcher.group("firstNameParent"))
+                        && entry.getValue().getLastName().equals(nameMatcher.group("lastNameParent"))) {
+                    entry.getValue().getParents().forEach(System.out::println);
+                }
             }
-
-            System.out.println("Children:");
-
-            person = getPerson(parentList, personToPrint);
-
-            if (person.getChildren() != null) {
-                person.getChildren().forEach(child ->
-                        System.out.println(getPerson(childrenList, child.getFirstName(), child.getLastName(), child.getDate())));
+        } else if (dateMatcher.find()) {
+            for (var entry : personMap.entrySet()) {
+                if (entry.getValue().getDate().equals(dateMatcher.group("dateParent"))) {
+                    entry.getValue().getParents().forEach(System.out::println);
+                }
             }
-        } else {
-            String firstName = personToPrint.split("\\s+")[0];
-            String lastName = personToPrint.split("\\s+")[1];
-
-            person = getPerson(parentList, firstName, lastName);
-
-            System.out.println(person);
-            System.out.println("Parents:");
-
-            person = getPerson(childrenList, firstName, lastName);
-
-            if (person.getParents() != null) {
-                person.getParents().forEach(parent ->
-                        System.out.println(getPerson(parentList, parent.getFirstName(), parent.getLastName(), parent.getDate())));
-            }
-            System.out.println("Children:");
-
-            person = getPerson(parentList, firstName, lastName);
-
-            if (person.getChildren() != null) {
-                person.getChildren().forEach(child ->
-                        System.out.println(getPerson(childrenList, child.getFirstName(), child.getLastName(), child.getDate())));
+        } else if (nameDateMatcher.find()) {
+            for (var entry : personMap.entrySet()) {
+                if ((entry.getValue().getFirstName().equals(nameDateMatcher.group("firstNameParent"))
+                        && entry.getValue().getLastName().equals(nameDateMatcher.group("lastNameParent")))
+                        || entry.getValue().getDate().equals(nameDateMatcher.group("dateParent"))) {
+                    entry.getValue().getParents().forEach(System.out::println);
+                }
             }
         }
 
-    }
+        System.out.println("Children:");
 
-    public static Person getPerson(List<Person> persons, String firstName, String lastName) {
-        Predicate<Person> personPredicate = p -> p.getFirstName().equals(firstName) && p.getLastName().equals(lastName);
-        if (persons.stream().anyMatch(personPredicate)) {
-            return persons.stream().filter(personPredicate).findFirst().get();
+        if (nameMatcher.find()) {
+            for (var entry : personMap.entrySet()) {
+                if (entry.getValue().getFirstName().equals(nameMatcher.group("firstNameParent"))
+                        && entry.getValue().getLastName().equals(nameMatcher.group("lastNameParent"))) {
+                    entry.getValue().getChildren().forEach(System.out::println);
+                }
+            }
+        } else if (dateMatcher.find()) {
+            for (var entry : personMap.entrySet()) {
+                if (entry.getValue().getDate().equals(dateMatcher.group("dateParent"))) {
+                    entry.getValue().getChildren().forEach(System.out::println);
+                }
+            }
+        } else if (nameDateMatcher.find()) {
+            for (var entry : personMap.entrySet()) {
+                if ((entry.getValue().getFirstName().equals(nameDateMatcher.group("firstNameParent"))
+                        && entry.getValue().getLastName().equals(nameDateMatcher.group("lastNameParent")))
+                        || entry.getValue().getDate().equals(nameDateMatcher.group("dateParent"))) {
+                    entry.getValue().getChildren().forEach(System.out::println);
+                }
+            }
         }
-        return null;
-    }
-
-    public static Person getPerson(List<Person> persons, String date) {
-        Predicate<Person> personPredicate = p -> p.getDate().equals(date);
-        if (persons.stream().anyMatch(personPredicate)) {
-            return persons.stream().filter(personPredicate).findFirst().get();
-        }
-        return null;
-    }
-
-    public static Person getPerson(List<Person> persons, String firstName, String lastName, String date) {
-        Predicate<Person> personPredicate = p -> (p.getFirstName().equals(firstName) && p.getLastName().equals(lastName)) || p.getDate().equals(date);
-        if (persons.stream().anyMatch(personPredicate)) {
-            return persons.stream().filter(personPredicate).findFirst().get();
-        }
-        return null;
     }
 }
