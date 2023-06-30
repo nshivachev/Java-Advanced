@@ -9,5 +9,19 @@ public class Main {
         IntStream.rangeClosed(1, 10).forEach(smartArray::add);
 
         smartArray.forEach(System.out::println);
+
+
+        MyStack stack = new MyStack();
+
+        IntStream.rangeClosed(1, 10).forEach(stack::push);
+
+        System.out.println("peek: " + stack.peek());
+
+        System.out.println("pop: " + stack.pop());
+
+        System.out.println("peek: " + stack.peek());
+
+        stack.forEach(System.out::println);
+
     }
 }
