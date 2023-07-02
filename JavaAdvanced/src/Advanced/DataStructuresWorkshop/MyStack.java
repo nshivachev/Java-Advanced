@@ -1,55 +1,64 @@
 package Advanced.DataStructuresWorkshop;
 
-import java.util.function.Consumer;
+import java.util.Iterator;
 
-public class MyStack {
+public class MyStack<E> implements Iterable<E> {
 
-    private static class Node {
-        private int element;
-        private Node prev;
+    @Override
+    public Iterator<E> iterator() {
+        return new Iterator<E>() {
+            private Node<E> current = top;
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
 
-        public Node(int element, Node prev) {
+            @Override
+            public E next() {
+                E element = current.element;
+                current = current.prev;
+                return element;
+            }
+        };
+    }
+
+    private static class Node<T> {
+        private T element;
+        private Node<T> prev;
+
+        public Node(T element, Node prev) {
             this.element = element;
             this.prev = prev;
         }
     }
 
-    private Node top;
+    private Node<E> top;
     private int size;
 
     public MyStack() {
     }
 
-    public void push(int element) {
-        Node newNode = new Node(element, this.top);
+    public void push(E element) {
+        Node<E> newNode = new Node<>(element, this.top);
         this.top = newNode;
         this.size++;
     }
 
-    public int pop() {
+    public E pop() {
         ensureNotEmpty();
-        int element = this.top.element;
+        E element = this.top.element;
         this.top = this.top.prev;
         this.size--;
         return element;
     }
 
-    public int peek() {
+    public E peek() {
         ensureNotEmpty();
         return this.top.element;
     }
 
     public int size() {
         return this.size;
-    }
-
-    public void forEach(Consumer<Integer> consumer) {
-        Node current = this.top;
-
-        while (current != null) {
-            consumer.accept(current.element);
-            current = current.prev;
-        }
     }
 
     private void ensureNotEmpty() {

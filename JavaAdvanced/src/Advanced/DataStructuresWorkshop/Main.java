@@ -11,7 +11,7 @@ public class Main {
         smartArray.forEach(System.out::println);
 
 
-        MyStack stack = new MyStack();
+        MyStack<Integer> stack = new MyStack<>();
 
         IntStream.rangeClosed(1, 10).forEach(stack::push);
 
@@ -21,7 +21,9 @@ public class Main {
 
         System.out.println("peek: " + stack.peek());
 
-        stack.forEach(System.out::println);
+        for (Integer integer : stack) {
+            System.out.println(integer);
+        }
 
     }
 }
