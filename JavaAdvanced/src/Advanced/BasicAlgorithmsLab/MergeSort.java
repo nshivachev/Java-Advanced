@@ -7,7 +7,6 @@ public class MergeSort {
     public static void main(String args[]) {
         Scanner scanner = new Scanner(System.in);
 
-
         int array[] = Arrays.stream(scanner.nextLine().split("\\s+"))
                 .mapToInt(Integer::parseInt)
                 .toArray();
@@ -79,7 +78,7 @@ public class MergeSort {
         }
     }
 
-    static void printArray(int array[]) {
+    private static void printArray(int array[]) {
         System.out.println(Arrays.toString(array).replaceAll("[\\[\\],]", ""));
     }
 }
